@@ -90,28 +90,14 @@
       font-weight: 600;
      }
     </style>
-    <script>
-        $(document).ready(function(){
-      $(".butn").click(function(){
-        alert("You have been successfully create a account");
-      });
-    });
-    function checkPassword(){
-      let l= document.getElementById('password').value;
-      if(l.length< 10){
-        document.getElementById("text").innerHTML="The Minimum number of characters are 10";
-      }else if(l.length){
-        document.getElementById("text").innerHTML="The Maximum number of characters are 15";
-      }
-    }
-      </script>
+    
 </head>
 <body>
     <div class="container">
         <!-- <svg class="bi" aria-hidden="true"><use xlink:href="#arrow-right"></use></svg> -->
       <br><center>
       <div class="registor">
-        <form>
+        <form method="POST">
           <h1>Register</h1>
           <div class="input-box">
             <input type="text" placeholder="first name" name="f_name" required>
