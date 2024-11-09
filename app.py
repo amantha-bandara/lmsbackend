@@ -29,9 +29,9 @@ def load_user(user_id):
 class User(db.Model,UserMixin):
     id = db.Column(db.Integer,primary_key = True)
     first_name=db.Column(db.String,nullable  = False,unique = True)
-    last_name=db.Column(db.String,nullable  = False,unique = True)
+    last_name=db.Column(db.String,nullable  = False)
     email =db.Column(db.String,nullable = False ,unique =True)
-    password=db.Column(db.String,nullable  = False)
+    password=db.Column(db.String,nullable  = False,unique = True)
       
 @app.route('/')
 def ma():
@@ -64,6 +64,7 @@ def reg():
             flash('somthing wrong maybe password')
             return render_template('register.html')
     else:
+        flash('registerform')
         return render_template('register.html')
 
 @app.route('/login',methods = ['GET','POST'])
@@ -78,10 +79,10 @@ def login():
                 if bcrypt.check_password_hash(user.password,pas):
                     login_user(user)
                     flash('login succesful')
-                    #session['email'] = ema
-                    #session['password'] = pas
-                    return render_template('home.html')
+                    
+                    return render_template('main.html')
                 else:
+                    flash('password not equal')
                     return render_template('login.html')
             else:
                flash('user does not exist')
@@ -90,6 +91,7 @@ def login():
             flash('fill the form')
             return render_template('login.html')   
     else:
+        flash('login')
         return render_template('login.html')
 
 
@@ -113,7 +115,6 @@ def login():
 def create_db():
     with app.app_context():
         db.create_all()
-
 
 
 
