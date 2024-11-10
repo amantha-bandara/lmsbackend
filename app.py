@@ -90,7 +90,7 @@ def login():
                     login_user(user)
                     flash('login succesful')
                     
-                    return render_template('main.html')
+                    return render_template('profile.html')
                 else:
                     flash("password doesn't match")
                     return render_template('login.html')
@@ -103,8 +103,25 @@ def login():
     else:
         
         return render_template('login.html')
+@app.route('/logout',methods = ['GET','POST'])
+def logout():
+    logout_user()
+    return render_template('login.html')
 
-
+@app.route('/profile')
+@login_required
+def profile():
+    if current_user.is_authenticated:
+        f_n = current_user.first_name
+        l_n = current_user.last_name
+        ga = current_user.grade
+        tn = current_user.t_no
+        ea = current_user.email
+        pa = current_user.password
+        print(f_n,l_n,ga,tn,ea,pa)
+        return render_template('profile.html')
+    else:
+        return render_template('login.html')
 
 
 
