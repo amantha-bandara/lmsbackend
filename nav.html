@@ -22,29 +22,56 @@
       </div>
       <div class="offcanvas-body">
         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
-          </li>
-          
-          <li class="nav-item">
-            <a class="nav-link active" href="cources.html">Courses</a>
-          </li>
-          
-          <li class="nav-item">
-            <a class="nav-link active " href="#">Lessons</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="{{url_for('reg')}}">Teachers</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="http://www.edupub.gov.lk/BooksDownload.php">Text book downloads</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="https://nwpedulk-my.sharepoint.com/personal/admin_nwpedu_lk/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fadmin%5Fnwpedu%5Flk%2FDocuments%2FPublic%20Downloads%2FTerm%20test%20Papers%20and%20Answers&ga=1">Past papers</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="{{url_for('profile')}}">profile</a>
-          </li>
+
+          {%if current_user.is_authenticated%}
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">Home</a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link active" href="cources.html">Courses</a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link active " href="#">Lessons</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="{{url_for('reg')}}">Teachers</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="http://www.edupub.gov.lk/BooksDownload.php">Text book downloads</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="https://nwpedulk-my.sharepoint.com/personal/admin_nwpedu_lk/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fadmin%5Fnwpedu%5Flk%2FDocuments%2FPublic%20Downloads%2FTerm%20test%20Papers%20and%20Answers&ga=1">Past papers</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="{{url_for('profile')}}">profile</a>
+            </li>
+          {%else%}
+            <li class="nav-item">
+              <a class="nav-link disabled" aria-current="page" href="#">Home</a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link disabled" href="cources.html">Courses</a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link disabled " href="#">Lessons</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" href="{{url_for('reg')}}">Teachers</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" href="http://www.edupub.gov.lk/BooksDownload.php">Text book downloads</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" href="https://nwpedulk-my.sharepoint.com/personal/admin_nwpedu_lk/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fadmin%5Fnwpedu%5Flk%2FDocuments%2FPublic%20Downloads%2FTerm%20test%20Papers%20and%20Answers&ga=1">Past papers</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" href="{{url_for('profile')}}">profile</a>
+            </li>
+          {%endif%}
           {%if current_user.is_authenticated%}
             <li class="nav-item">
               <a class="nav-link active" href="{{url_for('logout')}}">logout</a>
