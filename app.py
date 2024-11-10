@@ -126,7 +126,9 @@ def profile():
         return render_template('profile.html',first = f_n,last = l_n,grade = ga,tele = tn,email = ea,password = pa)
     else:
         return render_template('login.html')
-
+@app.route('/courses')
+def course():
+    return render_template('courses.html')
 
 
 
