@@ -57,15 +57,19 @@ def reg():
         hp2= bcrypt.generate_password_hash(pa)
         if em and pa:
             if int(ga)<=13 and int(ga)>0:
-                user = User.query.filter_by(email =em).first()
-                if  user is None:
-                  user = User(first_name=fm,last_name=lm,grade=ga,t_no=t,email=em,password =hp2)
-                  db.session.add(user)
-                  db.session.commit()
-                  return redirect(url_for('login'))
+                if int(len(t)) <=10 and int(len(t))>0:
+                    user = User.query.filter_by(email =em).first()
+                    if  user is None:
+                        user = User(first_name=fm,last_name=lm,grade=ga,t_no=t,email=em,password =hp2)
+                        db.session.add(user)
+                        db.session.commit()
+                        return redirect(url_for('login'))
+                    else:
+                        flash('email already taken')
+                        return render_template('register.html')
                 else:
-                 flash('email already taken')
-                 return render_template('register.html')
+                    flash('invalid phone number')
+                    return render_template('register.html')
             else:
                 flash ('grade should be greater than 10 and less than 14')
                 return render_template('register.html')
@@ -119,7 +123,7 @@ def profile():
         ea = current_user.email
         pa = current_user.password
         print(f_n,l_n,ga,tn,ea,pa)
-        return render_template('profile.html')
+        return render_template('profile.html',first = f_n,last = l_n,grade = ga,tele = tn,email = ea,password = pa)
     else:
         return render_template('login.html')
 
