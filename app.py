@@ -28,14 +28,17 @@ def load_user(user_id):
 
 class User(db.Model,UserMixin):
     id = db.Column(db.Integer,primary_key = True)
-    first_name=db.Column(db.String,nullable  = False,unique = True)
+    first_name=db.Column(db.String,nullable  = False)
     last_name=db.Column(db.String,nullable  = False)
+    grade =db.Column(db.Integer,nullable  = False)
+    t_no = db.Column(db.Integer,nullable  = False)
     email =db.Column(db.String,nullable = False ,unique =True)
     password=db.Column(db.String,nullable  = False,unique = True)
+
       
 @app.route('/')
 def ma():
-    flash('hello')
+    
     
     return render_template('main.html')
 
@@ -46,25 +49,32 @@ def reg():
     if request.method == 'POST':
         fm = request.form['f_name']
         lm = request.form['l_name']
+        ga = request.form['grade']
+        t = request.form['t_no']
         em = request.form['email']
         pa = request.form['password']
         
         hp2= bcrypt.generate_password_hash(pa)
         if em and pa:
-            user = User.query.filter_by(email =em).first()
-            if  user is None:
-                user = User(first_name=fm,last_name=lm,email=em,password =hp2)
-                db.session.add(user)
-                db.session.commit()
-                return redirect(url_for('login'))
+            if int(ga)<=13 and int(ga)>0:
+                user = User.query.filter_by(email =em).first()
+                if  user is None:
+                  user = User(first_name=fm,last_name=lm,grade=ga,t_no=t,email=em,password =hp2)
+                  db.session.add(user)
+                  db.session.commit()
+                  return redirect(url_for('login'))
+                else:
+                 flash('email already taken')
+                 return render_template('register.html')
             else:
-                flash('email already taken')
+                flash ('grade should be greater than 10 and less than 14')
                 return render_template('register.html')
+            
         else:
             flash('somthing wrong maybe password')
             return render_template('register.html')
     else:
-        flash('registerform')
+        
         return render_template('register.html')
 
 @app.route('/login',methods = ['GET','POST'])
@@ -82,7 +92,7 @@ def login():
                     
                     return render_template('main.html')
                 else:
-                    flash('password not equal')
+                    flash("password doesn't match")
                     return render_template('login.html')
             else:
                flash('user does not exist')
@@ -91,10 +101,8 @@ def login():
             flash('fill the form')
             return render_template('login.html')   
     else:
-        flash('login')
+        
         return render_template('login.html')
-
-
 
 
 
@@ -115,7 +123,6 @@ def login():
 def create_db():
     with app.app_context():
         db.create_all()
-
 
 
 
