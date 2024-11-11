@@ -32,10 +32,7 @@ def login_is_required(function):
             return function()
     return wrapper
 #****************************************************************   
-@app.route('/update',methods =['GET','POST'])
-@login_required
-def update():
-    return render_template('update.html')
+
 #************************************************************
 @app.route('/backtoprofile')
 def back():
@@ -75,14 +72,20 @@ def reg():
         if em and pa:
             if int(ga)<=13 and int(ga)>0:
                 if int(len(t)) <=10 and int(len(t))>0:
-                    user = User.query.filter_by(email =em).first()
-                    if  user is None:
-                        user = User(first_name=fm,last_name=lm,grade=ga,t_no=t,email=em,password =hp2,NIC=nic)
-                        db.session.add(user)
-                        db.session.commit()
-                        return redirect(url_for('login'))
+                    if int(len(pa)) >=8:
+                        user = User.query.filter_by(email =em).first()
+                        if  user is None:
+                           user = User(first_name=fm,last_name=lm,grade=ga,t_no=t,email=em,password =hp2,NIC=nic)
+                           db.session.add(user)
+                           db.session.commit()
+                           return redirect(url_for('login'))
+                           
+                           
+                        else:
+                            flash('invalid email')
+                            return render_template('register.html')
                     else:
-                        flash('email already taken')
+                        flash('password must be greater than 8 characters')
                         return render_template('register.html')
                 else:
                     flash('invalid phone number')
@@ -136,7 +139,56 @@ def profile():
         return render_template('profile.html')
     else:
         return render_template('login.html')
-        
+    
+@app.route('/update',methods =['GET','POST'])
+@login_required
+def update():
+    if current_user.is_authenticated:
+      return render_template('update.html')
+    else:
+      return render_template('login.html')    
+    
+
+@app.route('/updateprofile', methods=['GET', 'POST'])
+@login_required
+def updateprofile():
+    if current_user.is_authenticated:
+        pd = User.query.get(current_user.id)
+
+        if request.method == 'POST':
+            # Get the form data
+            fn = request.form['first_name']
+            ln = request.form['last_name']
+            ga = request.form['grade']
+            nic = request.form['nic']
+            tn = request.form['t_no']
+            em = request.form['email']
+            pa = request.form['password']
+
+            # Handle password update (if provided)
+            if pa:
+                hashed_password = bcrypt.generate_password_hash(pa).decode('utf-8')  # Hash password
+                pd.password = hashed_password  # Update password if provided
+
+            # Update other user details
+            pd.first_name = fn
+            pd.last_name = ln
+            pd.grade = ga
+            pd.NIC = nic
+            pd.t_no = tn
+            pd.email = em
+
+            try:
+                db.session.commit()  # Commit the changes to the database
+                flash('Profile updated successfully!', 'success')  # Flash success message
+                return redirect(url_for('profile'))  # Redirect to profile page after update
+            except Exception as e:
+                flash(f'An error occurred: {e}', 'danger')  # Flash any error
+                return render_template('update.html')  # Stay on the update page if there's an error
+
+    # If user is not authenticated, redirect to login page
+    return redirect('/login')
+       
     
 @app.route('/courses')
 @login_is_required
