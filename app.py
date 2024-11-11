@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, flash,get_flashed_messages,redirect,url_for,session
+from flask import Flask, request, render_template, flash,get_flashed_messages,redirect,url_for,session,abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin,LoginManager,login_user,login_required,logout_user,current_user
 from flask_bcrypt import Bcrypt
@@ -19,12 +19,29 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+#********************************************************
 @login_manager.user_loader
 def load_user(user_id):
-    
     return User.query.get(int(user_id))
+#************************************************************
+def login_is_required(function):
+    def wrapper(*arg,**kwargs):
+        if'google_id' not in session:
+            return abort(401)
+        else:
+            return function()
+    return wrapper
+#****************************************************************   
+@app.route('/update',methods =['GET','POST'])
+@login_required
+def update():
+    return render_template('update.html')
+#************************************************************
+@app.route('/backtoprofile')
+def back():
+    return redirect('profile')
 
-      
+#***************************************************************
 
 class User(db.Model,UserMixin):
     id = db.Column(db.Integer,primary_key = True)
@@ -34,12 +51,11 @@ class User(db.Model,UserMixin):
     t_no = db.Column(db.Integer,nullable  = False)
     email =db.Column(db.String,nullable = False ,unique =True)
     password=db.Column(db.String,nullable  = False,unique = True)
+    NIC = db.Column(db.String,nullable  = False,unique = True)
 
       
 @app.route('/')
 def ma():
-    
-    
     return render_template('main.html')
 
 
@@ -53,6 +69,7 @@ def reg():
         t = request.form['t_no']
         em = request.form['email']
         pa = request.form['password']
+        nic = request.form['NIC']
         
         hp2= bcrypt.generate_password_hash(pa)
         if em and pa:
@@ -60,7 +77,7 @@ def reg():
                 if int(len(t)) <=10 and int(len(t))>0:
                     user = User.query.filter_by(email =em).first()
                     if  user is None:
-                        user = User(first_name=fm,last_name=lm,grade=ga,t_no=t,email=em,password =hp2)
+                        user = User(first_name=fm,last_name=lm,grade=ga,t_no=t,email=em,password =hp2,NIC=nic)
                         db.session.add(user)
                         db.session.commit()
                         return redirect(url_for('login'))
@@ -71,7 +88,7 @@ def reg():
                     flash('invalid phone number')
                     return render_template('register.html')
             else:
-                flash ('grade should be greater than 10 and less than 14')
+                flash ('grade should be within the range of 1 - 13')
                 return render_template('register.html')
             
         else:
@@ -116,21 +133,17 @@ def logout():
 @login_required
 def profile():
     if current_user.is_authenticated:
-        f_n = current_user.first_name
-        l_n = current_user.last_name
-        ga = current_user.grade
-        tn = current_user.t_no
-        ea = current_user.email
-        pa = current_user.password
-        print(f_n,l_n,ga,tn,ea,pa)
-        return render_template('profile.html',first = f_n,last = l_n,grade = ga,tele = tn,email = ea,password = pa)
+        return render_template('profile.html')
     else:
         return render_template('login.html')
+        
+    
 @app.route('/courses')
+@login_is_required
 def course():
     return render_template('courses.html')
 
-
+        
 
 
 
