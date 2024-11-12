@@ -48,7 +48,9 @@ class User(db.Model,UserMixin):
     t_no = db.Column(db.Integer,nullable  = False)
     email =db.Column(db.String,nullable = False ,unique =True)
     password=db.Column(db.String,nullable  = False,unique = True)
-    NIC = db.Column(db.String,nullable  = False,unique = True)
+    NIC = db.Column(db.String,nullable  = True,unique = True)
+    pic = db.Column(db.String,nullable  = True,unique = True)
+
 
       
 @app.route('/')
@@ -130,7 +132,7 @@ def login():
 @app.route('/logout',methods = ['GET','POST'])
 def logout():
     logout_user()
-    return render_template('login.html')
+    return redirect(url_for('login'))
 
 @app.route('/profile')
 @login_required
@@ -164,6 +166,7 @@ def updateprofile():
             tn = request.form['t_no']
             em = request.form['email']
             pa = request.form['password']
+            
 
             # Handle password update (if provided)
             if pa:
@@ -177,7 +180,7 @@ def updateprofile():
             pd.NIC = nic
             pd.t_no = tn
             pd.email = em
-
+            
             try:
                 db.session.commit()  # Commit the changes to the database
                 flash('Profile updated successfully!', 'success')  # Flash success message
@@ -211,7 +214,6 @@ def course():
 def create_db():
     with app.app_context():
         db.create_all()
-
 
 
 
