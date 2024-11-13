@@ -2,18 +2,35 @@ from flask import Flask, request, render_template, flash,get_flashed_messages,re
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin,LoginManager,login_user,login_required,logout_user,current_user
 from flask_bcrypt import Bcrypt
+from flask_uploads import UploadSet,configure_uploads,IMAGES
+from authlib.integrations.flask_client import OAuth
+from api_key import *
 
+ 
 
 
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
-
 app.config['SECRET_KEY'] = 'gbjwk34tjkb!@#$%^&*()6328964789tjkvgabsbgwegbkbdk!(%R$)'  
+app.config['UPLOADED_IMAGES_DEST'] = 'static/uploads'
+
+images = UploadSet('images', IMAGES)  # Create an UploadSet for images
+configure_uploads(app, images)
 db = SQLAlchemy(app)
 
+
 bcrypt = Bcrypt(app)
+
+oauth = OAuth(app)
+google =oauth.register(
+        name='google',
+        client_id = CLIENT_ID,
+        client_secret =CLIENT_SECRET,
+        server_metadata_uri= 'https://accounts.google.com/.well-known/openid-configuration',
+        client_kwargs={'scope':'openid profile email'}
+)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -41,6 +58,7 @@ def back():
 #***************************************************************
 
 class User(db.Model,UserMixin):
+    __tablename__ = 'user'
     id = db.Column(db.Integer,primary_key = True)
     first_name=db.Column(db.String,nullable  = False)
     last_name=db.Column(db.String,nullable  = False)
@@ -48,11 +66,13 @@ class User(db.Model,UserMixin):
     t_no = db.Column(db.Integer,nullable  = False)
     email =db.Column(db.String,nullable = False ,unique =True)
     password=db.Column(db.String,nullable  = False,unique = True)
-    NIC = db.Column(db.String,nullable  = True,unique = True)
-    pic = db.Column(db.String,nullable  = True,unique = True)
+    NIC = db.Column(db.String,nullable  = True)
+    pic = db.Column(db.String,nullable  = True)
 
+def __repr__(self):
+    return f"<User {self.first_name} {self.last_name}>"
+    
 
-      
 @app.route('/')
 def ma():
     return render_template('main.html')
@@ -156,6 +176,7 @@ def update():
 def updateprofile():
     if current_user.is_authenticated:
         pd = User.query.get(current_user.id)
+        
 
         if request.method == 'POST':
             # Get the form data
@@ -166,12 +187,19 @@ def updateprofile():
             tn = request.form['t_no']
             em = request.form['email']
             pa = request.form['password']
+            pic = request.files['reciept']
+            file = pic.filename
             
 
             # Handle password update (if provided)
             if pa:
                 hashed_password = bcrypt.generate_password_hash(pa).decode('utf-8')  # Hash password
                 pd.password = hashed_password  # Update password if provided
+           
+            # Handle profile picture update (if a file is uploaded)
+            if pic:
+                filename = images.save(pic)  # Save the file using UploadSet
+                pd.pic = filename
 
             # Update other user details
             pd.first_name = fn
@@ -192,7 +220,37 @@ def updateprofile():
     # If user is not authenticated, redirect to login page
     return redirect('/login')
        
+@app.route('/login/google')
+def login_google():
+    try:
+        redirect_uri = url_for('autherized',_external= True)
+        return google.authorized_redirect(redirect_uri)
+    except Exception as e:
+        app.logger.error(f'error login:{str(e)}')
+        return 'error occured during login '
     
+@app.route('/autherized/google')
+def autherized():
+    token = google.authorize_access_token()
+    userinfo_endpoint = google.server_metadata['userinfo_endpoint']
+    res=  google.get(userinfo_endpoint)
+    user_info= res.json()
+    username = user_info['email']
+
+    user = User.query.filter_by(email=username).first()
+    if user:
+       login_user(user)
+       return redirect(url_for('profile'))
+    else:
+        return redirect(url_for('reg'))
+
+
+
+
+
+
+
+
 @app.route('/courses')
 @login_is_required
 def course():
