@@ -36,24 +36,24 @@
             <div class="container text-center">
                 <div class="row">
                     <div class="col">
-                        <img src="static/student.jpeg" width="250px" height="250px">
+                        <img src="static/uploads/{{current_user.pic}}" width="250px" height="250px">
                     </div>
                     <div class="col">
                         <!-- First Name -->
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="floatingInput" placeholder="" value="{{current_user.first_name}}" name="first_name">
+                            <input type="text" class="form-control" id="floatingInput" placeholder="" value="{{current_user.first_name}}" name="first_name" required>
                             <label for="floatingInput">First name</label>
                         </div>
 
                         <!-- Last Name -->
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="floatingInput" placeholder="" value="{{current_user.last_name}}" name="last_name">
+                            <input type="text" class="form-control" id="floatingInput" placeholder="" value="{{current_user.last_name}}" name="last_name" required>
                             <label for="floatingInput">Last name</label>
                         </div>
 
                         <!-- Grade -->
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="floatingInput" placeholder="" value="{{current_user.grade}}" name="grade">
+                            <input type="text" class="form-control" id="floatingInput" placeholder="" value="{{current_user.grade}}" name="grade" required>
                             <label for="floatingInput">Grade</label>
                         </div>
 
@@ -65,19 +65,19 @@
 
                         <!-- Telephone Number -->
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="floatingInput" placeholder="" value="{{current_user.t_no}}" name="t_no">
+                            <input type="text" class="form-control" id="floatingInput" placeholder="" value="{{current_user.t_no}}" name="t_no" required>
                             <label for="floatingInput">Telephone number</label>
                         </div>
 
                         <!-- Email -->
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="floatingInput" placeholder="" value="{{current_user.email}}" name="email">
+                            <input type="text" class="form-control" id="floatingInput" placeholder="" value="{{current_user.email}}" name="email" required>
                             <label for="floatingInput">Email</label>
                         </div>
 
                         <!-- Password -->
                         <div class="form-floating mb-3">
-                            <input type="password" class="form-control" id="floatingInput" placeholder="" name="password">
+                            <input type="password" class="form-control" id="floatingInput" placeholder="" name="password" >
                             <label for="floatingInput">Password</label>
                         </div>
 
