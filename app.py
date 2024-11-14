@@ -3,8 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin,LoginManager,login_user,login_required,logout_user,current_user
 from flask_bcrypt import Bcrypt
 from flask_uploads import UploadSet,configure_uploads,IMAGES
+import authlib
 from authlib.integrations.flask_client import OAuth
-from api_key import *
+
 
  
 
@@ -24,13 +25,16 @@ db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
 oauth = OAuth(app)
-google =oauth.register(
-        name='google',
-        client_id = CLIENT_ID,
-        client_secret =CLIENT_SECRET,
-        server_metadata_uri= 'https://accounts.google.com/.well-known/openid-configuration',
-        client_kwargs={'scope':'openid profile email'}
+
+google = oauth.register(
+    name='google',
+    #client_id='591740958219-snu37ejp24t4pbfe665tsdg6pqhf86ba.apps.googleusercontent.com',
+    #client_secret='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',
+    #server_metadata_uri='https://accounts.google.com/.well-known/openid-configuration',
+    #client_kwargs={'scope': 'openid profile email'},
+    #authorize_url='https://accounts.google.com/o/oauth2/auth'  # Add this line
 )
+    
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -65,7 +69,7 @@ class User(db.Model,UserMixin):
     grade =db.Column(db.Integer,nullable  = False)
     t_no = db.Column(db.Integer,nullable  = False)
     email =db.Column(db.String,nullable = False ,unique =True)
-    password=db.Column(db.String,nullable  = False,unique = True)
+    password=db.Column(db.String,nullable  = True,unique = True)
     NIC = db.Column(db.String,nullable  = True)
     pic = db.Column(db.String,nullable  = True)
 
@@ -97,8 +101,8 @@ def reg():
                     if int(len(pa)) >=8:
                         user = User.query.filter_by(email =em).first()
                         if  user is None:
-                           user = User(first_name=fm,last_name=lm,grade=ga,t_no=t,email=em,password =hp2,NIC=nic)
-                           db.session.add(user)
+                           new_user = User(first_name=fm,last_name=lm,grade=ga,t_no=t,email=em,password =hp2,NIC=nic)
+                           db.session.add(new_user)
                            db.session.commit()
                            return redirect(url_for('login'))
                            
@@ -222,34 +226,48 @@ def updateprofile():
        
 @app.route('/login/google')
 def login_google():
+  try:
+    redirect_uri = url_for('authorized', _external=True)  # Replace 'authorized' with your actual endpoint name
+    return oauth.google.authorize_redirect(redirect_uri)
+  except Exception as e:
+    app.logger.error(f'error during login:{str(e)}')
+    return'nn'
+
+
+
+
+@app.route('/authorized/google')
+def authorized():
     try:
-        redirect_uri = url_for('autherized',_external= True)
-        return google.authorized_redirect(redirect_uri)
+        # This method returns the token that you can use to fetch user data
+        token = oauth.google.authorize_access_token()
+
+        # Use the token to get user information
+        userinfo_endpoint = oauth.google.server_metadata['userinfo_endpoint']
+        res = oauth.google.get(userinfo_endpoint)
+        user_info = res.json()
+
+        # Extract user email from the user info response
+        email = user_info['email']
+
+        # Find the user in your database
+        user = User.query.filter_by(email=email).first()
+        if user:
+            # If user exists, log them in and redirect to their profile page
+            login_user(user)
+            session['email'] = email
+            session['oauth_token'] = token
+            flash('Login successful!', 'success')
+            return redirect(url_for('profile'))
+        else:
+            # If user doesn't exist, redirect them to registration page
+            flash('User not found, please register.', 'warning')
+            return redirect(url_for('reg'))
+
     except Exception as e:
-        app.logger.error(f'error login:{str(e)}')
-        return 'error occured during login '
-    
-@app.route('/autherized/google')
-def autherized():
-    token = google.authorize_access_token()
-    userinfo_endpoint = google.server_metadata['userinfo_endpoint']
-    res=  google.get(userinfo_endpoint)
-    user_info= res.json()
-    username = user_info['email']
-
-    user = User.query.filter_by(email=username).first()
-    if user:
-       login_user(user)
-       return redirect(url_for('profile'))
-    else:
-        return redirect(url_for('reg'))
-
-
-
-
-
-
-
+        app.logger.error(f'Error during authorization: {str(e)}')
+        flash('Authorization failed. Please try again.', 'danger')
+        return redirect(url_for('login'))
 
 @app.route('/courses')
 @login_is_required
@@ -337,5 +355,5 @@ def create_db():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0',port=5000,debug=True)
 
