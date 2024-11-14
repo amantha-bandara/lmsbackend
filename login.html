@@ -127,12 +127,12 @@
         .google-btn span {
             font-weight: 600;
         }
-        
-        /* Optional: Facebook Sign-In Button */
-        .facebook-btn {
+
+        /* Custom LinkedIn Sign-In Button */
+        .linkedin-btn {
             width: 100%;
             height: 45px;
-            background-color: #3b5998;
+            background-color: #0077B5;
             border: none;
             outline: none;
             border-radius: 40px;
@@ -147,12 +147,12 @@
             text-decoration: none;
         }
 
-        .facebook-btn i {
+        .linkedin-btn i {
             margin-right: 10px;
         }
 
-        .facebook-btn:hover {
-            background-color: #2d4373;
+        .linkedin-btn:hover {
+            background-color: #005C8A;
         }
     </style>
 </head>
@@ -179,9 +179,9 @@
                     <i class="fab fa-google"></i> <span>Sign in with Google</span>
                 </a>
 
-                <!-- Facebook Sign-In Button -->
-                <a href="#" class="facebook-btn">
-                    <i class="fab fa-facebook-f"></i> <span>Sign in with Facebook</span>
+                <!-- LinkedIn Sign-In Button (Replaced Facebook with LinkedIn) -->
+                <a href="{{ url_for('loginlink') }}" class="linkedin-btn">
+                    <i class="fab fa-linkedin-in"></i> <span>Sign in with LinkedIn</span>
                 </a>
             </form>
         </div>
