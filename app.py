@@ -16,6 +16,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SECRET_KEY'] = 'gbjwk34tjkb!@#$%^&*()6328964789tjkvgabsbgwegbkbdk!(%R$)'  
 app.config['UPLOADED_IMAGES_DEST'] = 'static/uploads'
+app.config['SERVER_NAME'] = '127.0.0.1:5000' 
 
 images = UploadSet('images', IMAGES)  # Create an UploadSet for images
 configure_uploads(app, images)
@@ -33,6 +34,16 @@ google = oauth.register(
     #server_metadata_uri='https://accounts.google.com/.well-known/openid-configuration',
     #client_kwargs={'scope': 'openid profile email'},
     #authorize_url='https://accounts.google.com/o/oauth2/auth'  # Add this line
+)
+linkedin = oauth.register(
+    name='linkedin',
+    #client_id='86vaqdmhlqom3o',  # Replace with your LinkedIn Client ID
+    #client_secret='WPL_AP1.FzUynmElTeIro5g2.Ymjeuw==',  # Replace with your LinkedIn Client Secret
+    #authorize_url='https://www.linkedin.com/oauth/v2/authorization',
+    #authorize_params=None,
+    #access_token_url='https://www.linkedin.com/oauth/v2/accessToken',
+    #refresh_token_url=None,
+    #client_kwargs={'scope':'openid profile email'}
 )
     
 
@@ -224,15 +235,19 @@ def updateprofile():
     # If user is not authenticated, redirect to login page
     return redirect('/login')
        
+
+
 @app.route('/login/google')
 def login_google():
-  try:
-    redirect_uri = url_for('authorized', _external=True)  # Replace 'authorized' with your actual endpoint name
-    return oauth.google.authorize_redirect(redirect_uri)
-  except Exception as e:
-    app.logger.error(f'error during login:{str(e)}')
-    return'nn'
-
+    try:
+        # Ensure the URL generated is fully qualified
+        redirect_uri = 'http://127.0.0.1:5000/authorized/google'
+        app.logger.info(f'Redirect URI: {redirect_uri}')  # Log the redirect URI for debugging
+        return oauth.google.authorize_redirect(redirect_uri)
+    except Exception as e:
+        app.logger.error(f'Error during login: {str(e)}')
+        flash('Something went wrong. Please try again later.', 'danger')
+        return redirect(url_for('login'))
 
 
 
@@ -242,10 +257,16 @@ def authorized():
         # This method returns the token that you can use to fetch user data
         token = oauth.google.authorize_access_token()
 
+        # Log the token for debugging
+        app.logger.info(f"Token received: {token}")
+
         # Use the token to get user information
         userinfo_endpoint = oauth.google.server_metadata['userinfo_endpoint']
         res = oauth.google.get(userinfo_endpoint)
         user_info = res.json()
+
+        # Log the user info
+        app.logger.info(f"User info: {user_info}")
 
         # Extract user email from the user info response
         email = user_info['email']
@@ -268,6 +289,33 @@ def authorized():
         app.logger.error(f'Error during authorization: {str(e)}')
         flash('Authorization failed. Please try again.', 'danger')
         return redirect(url_for('login'))
+
+@app.route('/login/linkdin')
+def loginlink():
+    redirect_uri = url_for('auth', _external=True)
+    app.logger.info(f'Redirect URI: {redirect_uri}')  # Log for debugging
+    return linkedin.authorize_redirect(redirect_uri)
+
+@app.route('/login/callback')
+def auth():
+    token = linkedin.authorize_access_token()  # Get the OAuth token
+    user = linkedin.get('v2/me', token=token)  # Fetch user data from LinkedIn
+    session['user'] = user.json()  # Store user data in session
+    return redirect(url_for('profile'))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @app.route('/courses')
 @login_is_required
