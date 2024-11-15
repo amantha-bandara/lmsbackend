@@ -1,57 +1,206 @@
 <!DOCTYPE html>
-    <html lang="en">
-        <head>
-            <title>LMS</title>
-            <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Material+Icons"
-            rel="stylesheet">
-            <link rel="stylesheet" href="style.css">
-            <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-            
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-        </head>
-<body> 
-    {% extends 'base.html' %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        /* Reset default styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block content %}
-    <div class="container mt-5">
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <a class="navbar-brand" href="#">Admin Panel</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('add_user') }}">Add User</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('user_list') }}">User List</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            line-height: 1.6;
+        }
 
-        <!-- Admin Page Content -->
-        <div class="mt-4">
-            <h2>Welcome, Admin!</h2>
-            <p>Select an option from the navbar to manage users.</p>
-        </div>
+        .navbar {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
 
+        .navbar ul {
+            list-style-type: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .navbar li {
+            margin: 0 20px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 5px 15px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            background-color: #34495e;
+        }
+
+        .content {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 30px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            display: none;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        form input,
+        form button {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background-color: #ecf0f1;
+        }
+
+        form input:focus,
+        form button:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        form button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        form button:hover {
+            background-color: #2980b9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        td {
+            background-color: #fff;
+        }
+
+        td a {
+            color: #e74c3c;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        td a:hover {
+            text-decoration: underline;
+        }
+
+        .logout-section {
+            text-align: center;
+        }
+
+        .logout-section a {
+            text-decoration: none;
+            color: #3498db;
+            font-size: 18px;
+        }
+
+        .logout-section a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            .navbar ul {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .navbar li {
+                margin: 10px 0;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            form input,
+            form button {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+
+            table th, table td {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <ul>
+            <li><a href="{{url_for('adminGetAllUser')}}" >Add User</a></li>
+            <li><a href="{{url_for('adminDashboard')}}" >User List</a></li>
+            <li>
+               
+                    <a href="{{ url_for('logoutadmin') }}">Logout </a>
+                
+                    
+                
+            </li>
+        </ul>
     </div>
 
-    <!-- Add User Form (Populated via Flask routes) -->
-    {% block add_user_form %}{% endblock %}
 
-    <!-- User List (Populated via Flask routes) -->
-    {% block user_list %}{% endblock %}
-{% endblock %}
+    
+      
+
+</body>
+</html>

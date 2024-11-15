@@ -10,7 +10,9 @@
 
 <nav class="navbar navbar-dark bg-dark fixed-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Dashboard</a>
+   <a class = 'navbar-brand'herf ='#'>Dashboard</a>
+
+    
     <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -46,6 +48,9 @@
             <li class="nav-item">
               <a class="nav-link active" href="{{url_for('profile')}}">profile</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="{{url_for('admin')}}">admin</a>
+            </li>
           {%else%}
             <li class="nav-item">
               <a class="nav-link disabled" aria-current="page" href="#">Home</a>
@@ -69,6 +74,9 @@
             </li>
             <li class="nav-item">
               <a class="nav-link disabled" href="{{url_for('profile')}}">profile</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" href="{{url_for('admin')}}">admin</a>
             </li>
           {%endif%}
           {%if current_user.is_authenticated%}
