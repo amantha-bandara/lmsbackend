@@ -1,4 +1,4 @@
-{% include 'admin.html' %}
+{% include 'admin/admin.html' %}
 {% block content %}
 <div class="container mt-4">
 
@@ -17,19 +17,19 @@
                     <!-- Total Users Row -->
                     <tr>
                         <td>Total Users</td>
-                        <td><h4 class="font-weight-bold">{{ totalUser }}</h4></td>
+                        <td><h4 class="font-weight-bold">{{ total_user }}</h4></td>
                         <td><i class="fas fa-users fa-3x text-success"></i></td>
                     </tr>
                     <!-- Approved Users Row -->
                     <tr>
                         <td>Approved Users</td>
-                        <td><h4 class="font-weight-bold">{{ totalApprove }}</h4></td>
+                        <td><h4 class="font-weight-bold">{{ total_approved }}</h4></td>
                         <td><i class="fas fa-check-circle fa-3x text-warning"></i></td>
                     </tr>
                     <!-- Disapproved Users Row -->
                     <tr>
                         <td>Disapproved Users</td>
-                        <td><h4 class="font-weight-bold">{{ NotTotalApprove }}</h4></td>
+                        <td><h4 class="font-weight-bold">{{ total_pending }}</h4></td>
                         <td><i class="fas fa-times-circle fa-3x text-danger"></i></td>
                     </tr>
                 </tbody>
